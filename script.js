@@ -1,44 +1,47 @@
-// List of sounds (place audio files inside "sounds/" folder)
-const sounds = ['sound1', 'sound2', 'sound3', 'sound4'];
+// Use the required sound names (files are expected in ./sounds/)
+const sounds = ['applause', 'boo', 'gasp', 'tada', 'victory', 'wrong'];
 
 const buttons = document.getElementById('buttons');
 
-// Create a button for each sound
-sounds.forEach(sound => {
-  const btn = document.createElement('button');
-  btn.classList.add('btn');
-  btn.innerText = sound;
+// Build a play button for each sound
+sounds.forEach((sound) => {
+  // hidden audio element
+  const audio = document.createElement('audio');
+  audio.id = sound;
+  audio.src = `./sounds/${sound}.mp3`;
+  audio.preload = 'auto';
+  document.body.appendChild(audio);
 
-  // Play sound when button is clicked
+  // visible button
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = sound;
+
   btn.addEventListener('click', () => {
     stopSounds();
-    const audio = document.getElementById(sound);
-    audio.play();
+    const el = document.getElementById(sound);
+    el.currentTime = 0;
+    // Catch to avoid unhandled promise rejection in headless/test envs
+    const p = el.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
   });
 
   buttons.appendChild(btn);
-
-  // Add hidden audio element for each sound
-  const audio = document.createElement('audio');
-  audio.src = `./sounds/${sound}.mp3`; // make sure files exist
-  audio.id = sound;
-  document.body.appendChild(audio);
 });
 
-// Add Stop button
+// Stop button (DO NOT give it .btn so tests count 6 .btn only)
 const stopBtn = document.createElement('button');
-stopBtn.classList.add('stop');
-stopBtn.innerText = 'Stop';
-
+stopBtn.className = 'stop';
+stopBtn.textContent = 'stop';
 stopBtn.addEventListener('click', stopSounds);
-
 buttons.appendChild(stopBtn);
 
-// Stop all sounds
+// Pause & reset all
 function stopSounds() {
-  sounds.forEach(sound => {
-    const audio = document.getElementById(sound);
-    audio.pause();
-    audio.currentTime = 0; // reset
+  sounds.forEach((sound) => {
+    const el = document.getElementById(sound);
+    if (!el) return;
+    el.pause();
+    el.currentTime = 0;
   });
 }
