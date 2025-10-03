@@ -21,9 +21,7 @@ sounds.forEach((sound) => {
     stopSounds();
     const el = document.getElementById(sound);
     el.currentTime = 0;
-    // Catch to avoid unhandled promise rejection in headless/test envs
-    const p = el.play();
-    if (p && typeof p.catch === 'function') p.catch(() => {});
+    const p = el.play();    
   });
 
   buttons.appendChild(btn);
